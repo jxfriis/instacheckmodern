@@ -29,7 +29,8 @@ const FLAG_FOLDER = "📁";
  */
 export function exportState(
   state: InstaCheckState,
-  includeWhitelist: boolean
+  includeWhitelist: boolean,
+  includeFollowCount = false
 ): string {
   const lines = state.unfollowers
     .filter((u) => includeWhitelist || !state.whitelisted.has(u))
@@ -52,7 +53,11 @@ export function exportState(
       return flags ? `${flags} ${u}` : u;
     });
 
-  lines.unshift(`#settings autoWL=${state.autoWhitelistOnFolder}`);
+  const settings = [`autoWL=${state.autoWhitelistOnFolder}`];
+  if (includeFollowCount && state.followCount) {
+    settings.push(`followCount=${state.followCount}`);
+  }
+  lines.unshift(`#settings ${settings.join(" ")}`);
   return lines.join("\n");
 }
 
@@ -89,8 +94,10 @@ export function importState(text: string): InstaCheckState | null {
 
   for (const line of raw) {
     if (line.startsWith("#settings")) {
-      const m = line.match(/autoWL=(true|false)/);
-      if (m) state.autoWhitelistOnFolder = m[1] === "true";
+      const awl = line.match(/autoWL=(true|false)/);
+      if (awl) state.autoWhitelistOnFolder = awl[1] === "true";
+      const fc = line.match(/followCount=(\d+)/);
+      if (fc) state.followCount = fc[1];
       continue;
     }
 

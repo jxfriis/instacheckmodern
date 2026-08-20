@@ -81,6 +81,11 @@ export const en = {
   // Export menu
   exportAll: "All remaining (incl. whitelist)",
   exportNoWL: "Without whitelist",
+  exportFollowTitle: "Include follower count?",
+  exportFollowDesc:
+    "Include your follower count ({n}) so it carries over when you import this file.",
+  exportFollowInclude: "Include",
+  exportFollowSkip: "Skip",
 
   // Toasts
   copied: "Copied",

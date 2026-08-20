@@ -13,6 +13,7 @@ import { RefreshIcon } from "@/components/ui/refresh";
 import { Hero } from "./hero";
 import { InputPanel } from "./input-panel";
 import { Thinking } from "./thinking";
+import { StickyCounter } from "./sticky-counter";
 import { Results } from "./results";
 import { HowTo } from "./how-to";
 import { Footer } from "./footer";
@@ -108,6 +109,7 @@ export function InstaCheck() {
         <Results />
         <HowTo />
       </main>
+      <StickyCounter />
       <Footer />
     </InstaCheckContext.Provider>
   );

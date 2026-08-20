@@ -196,8 +196,11 @@ export function useInstaCheck() {
   }, []);
 
   const exportFile = useCallback(
-    (includeWL: boolean) => {
-      download(exportFileName(), exportState(state, includeWL));
+    (includeWL: boolean, includeFollowCount = false) => {
+      download(
+        exportFileName(),
+        exportState(state, includeWL, includeFollowCount)
+      );
       toast(t.exported);
     },
     [state, download, t, toast]

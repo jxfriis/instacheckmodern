@@ -281,7 +281,7 @@ export function UserRow({
           target="_blank"
           rel="noopener noreferrer"
           aria-label={t.open}
-          className="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="inline-flex size-7 items-center justify-center rounded-md text-ig-pink transition-colors hover:bg-ig-pink/10 hover:text-ig-pink"
         >
           <ExternalLinkIcon size={16} className="[&_svg]:block" />
         </a>

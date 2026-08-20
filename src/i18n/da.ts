@@ -75,6 +75,11 @@ export const da: Messages = {
 
   exportAll: "Alle resterende (inkl. whitelist)",
   exportNoWL: "Uden whitelist",
+  exportFollowTitle: "Inkludér antal du følger?",
+  exportFollowDesc:
+    "Inkludér dit antal ({n}), så det overføres, når du importerer filen.",
+  exportFollowInclude: "Inkludér",
+  exportFollowSkip: "Spring over",
 
   copied: "Kopieret",
   listCopied: "Liste kopieret",
