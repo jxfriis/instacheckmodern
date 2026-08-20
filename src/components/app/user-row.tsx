@@ -94,7 +94,11 @@ export function UserRow({
       )}
     >
       <div
-        className="grid size-8 shrink-0 place-items-center rounded-lg text-[11px] font-bold text-white"
+        className={cn(
+          "grid size-8 shrink-0 place-items-center rounded-lg text-[11px] font-bold text-white",
+          wl && "opacity-40 blur-[1.5px]",
+          checked && "brightness-50"
+        )}
         style={avatarStyle(u, checked, wl, skip, watch, folder)}
         aria-hidden
       >
@@ -106,8 +110,9 @@ export function UserRow({
           <span
             className={cn(
               "truncate font-mono text-sm",
-              skip && "text-muted-foreground line-through",
-              watch && "text-watch-fg"
+              (skip || checked) && "text-muted-foreground line-through",
+              watch && "text-watch-fg",
+              wl && "opacity-40"
             )}
           >
             @{u}
@@ -121,7 +126,7 @@ export function UserRow({
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-0.5">
+      <div className={cn("flex shrink-0 items-center gap-0.5", wl && "opacity-40")}>
         <IconAction
           label={wl ? t.wlRemove : t.wlAdd}
           active={wl}
@@ -198,42 +203,6 @@ export function UserRow({
             }
           />
           <DropdownMenuContent align="end">
-            {state.folders.size > 0 && (
-              <>
-                <div className="px-1.5 py-1 text-xs font-medium text-muted-foreground">
-                  {t.filterByFolder}
-                </div>
-                <DropdownMenuItem
-                  onClick={() => actions.setActiveFolder(null)}
-                >
-                  <span className="grid w-4 place-items-center">
-                    {!state.activeFolder && (
-                      <Check className="size-3.5" strokeWidth={3} />
-                    )}
-                  </span>
-                  {t.filterAll}
-                </DropdownMenuItem>
-                {Array.from(state.folders.keys()).map((name) => {
-                  const active = state.activeFolder === name;
-                  return (
-                    <DropdownMenuItem
-                      key={`filter-${name}`}
-                      onClick={() => actions.setActiveFolder(active ? null : name)}
-                    >
-                      <span className="grid w-4 place-items-center">
-                        {active && (
-                          <Check className="size-3.5" strokeWidth={3} />
-                        )}
-                      </span>
-                      <Folder className="size-3.5 text-muted-foreground" />
-                      {name}
-                    </DropdownMenuItem>
-                  );
-                })}
-                <DropdownMenuSeparator />
-              </>
-            )}
-
             <div className="px-1.5 py-1 text-xs font-medium text-muted-foreground">
               {t.foldersLabel}
             </div>
