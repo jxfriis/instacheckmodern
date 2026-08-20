@@ -1,0 +1,165 @@
+import type { Messages } from "./en";
+
+export const da: Messages = {
+  heroTitle1: "Find dem der",
+  heroTitleGrad: "ikke følger tilbage",
+  heroSub: "Indsæt dine lister — vi finder dem på et sekund. Intet forlader din browser.",
+
+  lbl1: "Dem du følger",
+  lbl2: "Dem der følger dig",
+  placeholder1: "Indsæt brugernavne, ét pr. linje…",
+  placeholder2: "Indsæt brugernavne, ét pr. linje…",
+  or: "eller upload en",
+  upload: ".txt-fil",
+  clear: "Ryd",
+  run: "Analysér nu",
+  analyzing: "Analyserer…",
+  done: "Færdig",
+
+  // Thinking trace
+  thinkTitle: "Tænkte",
+  thinkSteps: "Trin",
+  thinkReasoning: "Ræsonnement",
+  thinkSearch: "Søgning",
+  thinkCoding: "Kode",
+  thinkStep1: "Parsede {n} konti du følger",
+  thinkStep2: "Parsede {n} konti der følger dig",
+  thinkStep3: "Sammenlignede de to lister",
+  thinkStep4: "Fandt {n} der ikke følger tilbage",
+  thinkReason1: "{n} snyltere fundet — brutalt",
+  thinkReason2: "Markerede 0 navne som stavefejl (indtil videre)",
+  thinkReason3: "Konklusion: oprydning anbefales",
+  thinkSearch1: "Krydsrefererede {n} brugernavne",
+  thinkSearch2: "Fjernede @-præfikser & lavede alt til små bogstaver",
+  thinkSearch3: "Fangede 0 duplikerede konti",
+  thinkCode1: "for (u of following) if (!followers.has(u)) hit(u)",
+  thinkCode2: "O(n) takket være Set — bip bop",
+  thinkCode3: "Kørte 100% i din browser",
+  dragDrop: "Slip din .txt her",
+
+  uploadingFollowing: "Uploader: Dem du følger",
+  uploadingFollowers: "Uploader: Dem der følger dig",
+
+  statAll: "Total",
+  statDone: "Unfollowed",
+  statLeft: "Tilbage",
+  statWL: "Whitelist",
+  statSkip: "Springer over",
+  statWatch: "Overvåget",
+
+  filterAll: "Alle",
+  filterByFolder: "Vis kun",
+  filterPending: "Mangler",
+  filterDone: "Unfollowed",
+  filterWL: "Whitelist",
+  filterSkip: "Skip",
+  filterWatch: "Overvågning",
+  search: "Søg…",
+  sortLbl: "Sortér",
+  sortAZ: "A–Z",
+  sortZA: "Z–A",
+  sortPending: "Mangler først",
+
+  followLbl: "Antal du følger nu (valgfrit)",
+  goalPlaceholder: "f.eks. 1200",
+  goalPrefix: "Nu på",
+
+  copyAll: "Kopiér resterende",
+  clearDone: "Nulstil",
+  resetTitle: "Nulstil fremskridt?",
+  resetDesc: "Dette fjerner alle dine 'unfollowed'-afkrydsninger. Det kan ikke fortrydes.",
+  rescan: "Ny søgning",
+  newSearchQuestion: "Ny søgning?",
+  export: "Eksport",
+  import: "Importér",
+
+  exportAll: "Alle resterende (inkl. whitelist)",
+  exportNoWL: "Uden whitelist",
+
+  copied: "Kopieret",
+  listCopied: "Liste kopieret",
+  exported: "Downloadet",
+  addedToFolder: "Tilføjet til mappe",
+  removedFromFolder: "Fjernet fra mappe",
+  folderCreated: "Mappe oprettet",
+  milestone: "Nyt milepæl!",
+  mileSub: "Du følger nu under",
+
+  open: "Åbn på Instagram",
+  copy: "Kopiér brugernavn",
+  wlAdd: "Tilføj til whitelist",
+  wlRemove: "Fjern fra whitelist",
+  skipAdd: "Spring over (ugyldigt navn?)",
+  skipRemove: "Fjern \"spring over\"",
+  skipTooltip: "Spring over — dette navn ser forkert ud.\nEksporteres/kopieres aldrig.",
+  watchAdd: "Tilføj til overvågning",
+  watchRemove: "Fjern fra overvågning",
+  watchTooltip:
+    "Overvågning — behold brugernavnet selv\nnår du unfollower. Vises altid i overvågningslisten.",
+  folderQuick: "Tilføj til",
+  folderNew: "Ny mappe",
+
+  noResults: "Alle du følger, følger dig tilbage",
+  noResultsSub: "Feedet er rent — fedt!",
+  noMatch: "Ingen resultater",
+
+  foldersLabel: "Mapper",
+  watchPanelTitle: "Overvågningsliste",
+  watchPanelSub: "Disse er unfollowed men du beholder brugernavnet.",
+  watchUnwatch: "Fjern",
+
+  nfTitle: "Vælg eller opret mappe",
+  nfExistingLbl: "Eksisterende mapper",
+  nfOrTxt: "eller opret ny",
+  nfNewLbl: "Ny mappe",
+  nfCancel: "Annuller",
+  nfConfirm: "Tilføj",
+  nfPlaceholder: "Nyt mappenavn…",
+
+  autoWLLabel: "Mappe → WL",
+  autoWLOn: "Mappe → WL til",
+  autoWLOff: "Mappe → WL fra",
+
+  extTitle: "Sådan henter du dine lister",
+  extSub: "Gratis, sikker og nem at bruge",
+  extDesc:
+    "For at hente dine lister skal du bruge InstaCheck Chrome-udvidelsen. Den scraper din følger-liste og dem-du-følger-liste direkte fra Instagram og gemmer dem som .txt-filer, klar til at uploade her.",
+  extBtn: "Download InstaCheck v2 (.zip)",
+  tutLabel: "Sådan bruger du det",
+  phase1: "Installation",
+  phase2: "Scrape dine lister",
+  phase3: "Analysér",
+  tutStep1Title: "Download og udpak filen",
+  tutStep1Desc:
+    "Klik på download-knappen herover. Pak .zip-filen ud — du får en mappe kaldet instacheck-v2.",
+  tutStep2Title: "Åbn Chrome-udvidelser",
+  tutStep2Desc:
+    "Gå til chrome://extensions i Chrome. Aktivér Udviklertilstand øverst til højre.",
+  tutStep3Title: "Indlæs udvidelsen",
+  tutStep3Desc:
+    'Klik "Indlæs upakket" og vælg instacheck-v2-mappen. Udvidelsesikonet vises i din toolbar.',
+  tutStep4Title: "Åbn Instagram og start udvidelsen",
+  tutStep4Desc:
+    "Gå til instagram.com. Klik på InstaCheck-ikonet i din Chrome-toolbar.",
+  tutStep5Title: "Scrape dine lister",
+  tutStep5Desc:
+    'Klik "Scrape Following" og derefter "Scrape Followers". Vent mens udvidelsen henter alle brugere automatisk.',
+  tutStep6Title: "Download .txt-filerne",
+  tutStep6Desc:
+    'Klik "Download Following (.txt)" og "Download Followers (.txt)" for at gemme de to lister lokalt.',
+  tutStep7Title: "Upload filerne i felterne ovenfor",
+  tutStep7Desc:
+    'Brug "Upload .txt"-knapperne under hvert felt til at indlæse dine downloadede filer. Listerne udfyldes automatisk.',
+  tutStep8Title: "Klik Analysér og gennemgå listen",
+  tutStep8Desc:
+    'Tryk "Analysér nu", og InstaCheck finder præcis hvem der ikke følger dig tilbage.',
+  followingUploadLbl: "Upload Following .txt",
+  followersUploadLbl: "Upload Followers .txt",
+
+  themeLight: "Lys",
+  themeDark: "Mørk",
+  themeToggle: "Skift tema",
+  langLabel: "Sprog",
+
+  privacyNote: "Privat af design — dine data forlader aldrig browseren.",
+};

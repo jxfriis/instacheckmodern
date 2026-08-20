@@ -1,0 +1,315 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-syne), var(--font-geist-sans), ui-sans-serif,
+    system-ui, sans-serif;
+
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-heading: var(--font-display);
+
+  /* Instagram brand accents */
+  --color-ig-orange: var(--ig-orange);
+  --color-ig-pink: var(--ig-pink);
+  --color-ig-purple: var(--ig-purple);
+  --color-ig-blue: var(--ig-blue);
+
+  /* Tool states */
+  --color-wl: var(--wl);
+  --color-wl-fg: var(--wl-fg);
+  --color-skip: var(--skip);
+  --color-skip-fg: var(--skip-fg);
+  --color-watch: var(--watch);
+  --color-watch-fg: var(--watch-fg);
+
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --ig-orange: #f58529;
+  --ig-pink: #dd2a7b;
+  --ig-purple: #8134af;
+  --ig-blue: #518cd4;
+
+  --grad-ig: linear-gradient(
+    135deg,
+    var(--ig-orange) 0%,
+    var(--ig-pink) 52%,
+    var(--ig-purple) 100%
+  );
+
+  --background: oklch(0.978 0.006 95);
+  --foreground: oklch(0.18 0.012 285);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.012 285);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.012 285);
+  --primary: oklch(0.2 0.012 285);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0.004 95);
+  --secondary-foreground: oklch(0.2 0.012 285);
+  --muted: oklch(0.955 0.005 95);
+  --muted-foreground: oklch(0.5 0.02 285);
+  --accent: oklch(0.955 0.005 95);
+  --accent-foreground: oklch(0.2 0.012 285);
+  --destructive: oklch(0.58 0.22 25);
+  --border: oklch(0.9 0.008 285);
+  --input: oklch(0.9 0.008 285);
+  --ring: oklch(0.58 0.22 330);
+
+  --wl: oklch(0.72 0.17 45);
+  --wl-fg: oklch(0.45 0.14 40);
+  --skip: oklch(0.62 0.2 25);
+  --skip-fg: oklch(0.5 0.19 25);
+  --watch: oklch(0.58 0.14 250);
+  --watch-fg: oklch(0.45 0.14 250);
+
+  --chart-1: oklch(0.72 0.17 45);
+  --chart-2: oklch(0.58 0.2 330);
+  --chart-3: oklch(0.48 0.16 300);
+  --chart-4: oklch(0.58 0.14 250);
+  --chart-5: oklch(0.45 0.02 285);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.18 0.012 285);
+  --sidebar-primary: oklch(0.2 0.012 285);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.96 0.004 95);
+  --sidebar-accent-foreground: oklch(0.2 0.012 285);
+  --sidebar-border: oklch(0.9 0.008 285);
+  --sidebar-ring: oklch(0.58 0.22 330);
+}
+
+.dark {
+  --background: oklch(0.155 0.014 285);
+  --foreground: oklch(0.95 0.006 285);
+  --card: oklch(0.19 0.016 285);
+  --card-foreground: oklch(0.95 0.006 285);
+  --popover: oklch(0.205 0.016 285);
+  --popover-foreground: oklch(0.95 0.006 285);
+  --primary: oklch(0.95 0.006 285);
+  --primary-foreground: oklch(0.16 0.014 285);
+  --secondary: oklch(0.24 0.016 285);
+  --secondary-foreground: oklch(0.95 0.006 285);
+  --muted: oklch(0.24 0.016 285);
+  --muted-foreground: oklch(0.66 0.014 285);
+  --accent: oklch(0.24 0.016 285);
+  --accent-foreground: oklch(0.95 0.006 285);
+  --destructive: oklch(0.66 0.19 25);
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.62 0.19 330);
+
+  --wl: oklch(0.75 0.15 50);
+  --wl-fg: oklch(0.8 0.13 55);
+  --skip: oklch(0.68 0.19 25);
+  --skip-fg: oklch(0.72 0.17 25);
+  --watch: oklch(0.68 0.13 250);
+  --watch-fg: oklch(0.76 0.12 250);
+
+  --chart-1: oklch(0.75 0.15 50);
+  --chart-2: oklch(0.62 0.19 330);
+  --chart-3: oklch(0.5 0.16 300);
+  --chart-4: oklch(0.68 0.13 250);
+  --chart-5: oklch(0.5 0.02 285);
+  --sidebar: oklch(0.19 0.016 285);
+  --sidebar-foreground: oklch(0.95 0.006 285);
+  --sidebar-primary: oklch(0.95 0.006 285);
+  --sidebar-primary-foreground: oklch(0.16 0.014 285);
+  --sidebar-accent: oklch(0.24 0.016 285);
+  --sidebar-accent-foreground: oklch(0.95 0.006 285);
+  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-ring: oklch(0.62 0.19 330);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: color-mix(in oklch, var(--ig-pink) 30%, transparent);
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background-image: var(--grad-ig);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .bg-gradient-ig {
+    background-image: var(--grad-ig);
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .glass {
+    background: color-mix(in oklch, var(--card) 72%, transparent);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    border: 1px solid var(--border);
+  }
+
+  .glass-strong {
+    background: color-mix(in oklch, var(--card) 90%, transparent);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid var(--border);
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Gradient shimmer (used by loaders / "thinking" indicator) */
+@keyframes gradient-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-shimmer {
+  background-image: var(--grad-ig);
+  background-size: 220% 220%;
+  animation: gradient-shimmer 3s ease infinite;
+}
+
+/* Ripple rings (milestone / burst effects) */
+@keyframes ripple-expand {
+  0% {
+    opacity: 0.55;
+    transform: translate(-50%, -50%) scale(0.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.ripple-ring {
+  position: fixed;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: ripple-expand 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  z-index: 60;
+}
+
+/* Milestone shimmer sweep */
+@keyframes milestone-sweep {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(200%);
+    opacity: 0;
+  }
+}
+
+.milestone-shimmer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 55;
+  overflow: hidden;
+}
+.milestone-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    color-mix(in oklch, var(--ig-orange) 12%, transparent) 45%,
+    color-mix(in oklch, var(--ig-pink) 12%, transparent) 50%,
+    color-mix(in oklch, var(--ig-purple) 12%, transparent) 55%,
+    transparent 70%
+  );
+  animation: milestone-sweep 0.9s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
