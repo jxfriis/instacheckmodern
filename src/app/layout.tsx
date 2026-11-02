@@ -1,25 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Syne } from "next/font/google";
+import { Figtree, Rubik } from "next/font/google";
 
 import { ThemeProvider } from "@/providers/theme-provider";
 import { I18nProvider } from "@/providers/i18n-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ToastProvider } from "@/hooks/use-toast";
+import { MotionProvider } from "@/providers/motion-provider";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const figtree = Figtree({
+  variable: "--font-figtree",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const syne = Syne({
-  variable: "--font-syne",
+const rubik = Rubik({
+  variable: "--font-rubik",
   subsets: ["latin"],
   display: "swap",
 });
@@ -50,7 +46,7 @@ export default function RootLayout({
     <html
       lang="da"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${syne.variable} h-full antialiased`}
+      className={`${figtree.variable} ${rubik.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
@@ -59,7 +55,9 @@ export default function RootLayout({
         <ThemeProvider>
           <I18nProvider>
             <TooltipProvider>
-              <ToastProvider>{children}</ToastProvider>
+              <MotionProvider>
+                <ToastProvider>{children}</ToastProvider>
+              </MotionProvider>
             </TooltipProvider>
           </I18nProvider>
         </ThemeProvider>

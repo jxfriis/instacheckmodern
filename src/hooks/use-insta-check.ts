@@ -22,7 +22,12 @@ import {
   getVisible,
 } from "@/lib/instacheck/selectors";
 import { exportFileName, exportState, importState } from "@/lib/instacheck/format";
-import type { FilterMode, InstaCheckState, SortMode } from "@/lib/instacheck/types";
+import type {
+  FilterMode,
+  InstaCheckAction,
+  InstaCheckState,
+  SortMode,
+} from "@/lib/instacheck/types";
 
 import { useI18n } from "@/providers/i18n-provider";
 import { useToast } from "@/hooks/use-toast";
@@ -34,23 +39,25 @@ export function useInstaCheck() {
   const { milestoneBurst } = useEffects();
 
   const [state, dispatch] = useReducer(reducer, undefined, createInitialState);
-  const hydratedRef = useRef(false);
   const lastMilestone = useRef<number | null>(null);
 
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        dispatch({ type: "hydrate", state: deserializeState(JSON.parse(raw)) });
-      }
+      dispatch({
+        type: "hydrate",
+        state: raw
+          ? deserializeState(JSON.parse(raw))
+          : { ...createInitialState(), hydrated: true },
+      });
     } catch {
       /* ignore corrupt storage */
+      dispatch({ type: "clearAll" });
     }
-    hydratedRef.current = true;
   }, []);
 
   useEffect(() => {
-    if (!hydratedRef.current) return;
+    if (!state.hydrated) return;
     try {
       window.localStorage.setItem(
         STORAGE_KEY,
@@ -158,26 +165,46 @@ export function useInstaCheck() {
     toast(state.autoWhitelistOnFolder ? t.autoWLOff : t.autoWLOn);
   }, [state.autoWhitelistOnFolder, t, toast]);
 
+  /** Applies a big change straight away and offers a way back, instead of asking first. */
+  const withUndo = useCallback(
+    (action: InstaCheckAction, msg: string, sub?: string) => {
+      const before = state;
+      dispatch(action);
+      toast(msg, sub, 8000, {
+        label: t.undo,
+        onClick: () => dispatch({ type: "restore", state: before }),
+      });
+    },
+    [state, t, toast]
+  );
+
   const resetChecked = useCallback(
-    () => dispatch({ type: "resetChecked" }),
-    []
+    () => withUndo({ type: "resetChecked" }, t.resetDone),
+    [withUndo, t]
   );
 
   const rescan = useCallback(() => {
-    dispatch({ type: "rescan" });
+    withUndo({ type: "rescan" }, t.newCompareDone, t.newCompareSub);
     lastMilestone.current = null;
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  }, [withUndo, t]);
+
+  const clearAll = useCallback(() => {
+    withUndo({ type: "clearAll" }, t.clearAllDone);
+    lastMilestone.current = null;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [withUndo, t]);
 
   const importFromFile = useCallback(
     (text: string): boolean => {
       const parsed = importState(text);
       if (!parsed) {
-        toast(t.noMatch);
+        toast(t.importFailed, t.importFailedSub, 4000);
         return false;
       }
       dispatch({ type: "import", state: parsed });
       lastMilestone.current = null;
+      toast(t.imported);
       return true;
     },
     [t, toast]
@@ -195,23 +222,31 @@ export function useInstaCheck() {
     URL.revokeObjectURL(url);
   }, []);
 
-  const exportFile = useCallback(
-    (includeWL: boolean, includeFollowCount = false) => {
-      download(
-        exportFileName(),
-        exportState(state, includeWL, includeFollowCount)
-      );
-      toast(t.exported);
-    },
-    [state, download, t, toast]
-  );
+  /** A save file to continue from later. */
+  const exportProgress = useCallback(() => {
+    download(exportFileName(), exportState(state));
+    toast(t.exported);
+  }, [state, download, t, toast]);
+
+  /** Just the names still to be dealt with. */
+  const exportRemaining = useCallback(() => {
+    download(
+      exportFileName(t.remainingFileSuffix),
+      getExportable(state, false).join("\n")
+    );
+    toast(t.exported);
+  }, [state, download, t, toast]);
 
   const copyRemaining = useCallback(() => {
-    const list = getExportable(state, true);
+    const list = getExportable(state, false);
+    if (list.length === 0) {
+      toast(t.nothingToCopy);
+      return;
+    }
     navigator.clipboard
       .writeText(list.join("\n"))
-      .then(() => toast(t.listCopied))
-      .catch(() => toast(t.noMatch));
+      .then(() => toast(t.listCopied, t.listCopiedSub.replace("{n}", String(list.length))))
+      .catch(() => toast(t.copyFailed));
   }, [state, t, toast]);
 
   const copyUsername = useCallback(
@@ -219,7 +254,7 @@ export function useInstaCheck() {
       navigator.clipboard
         .writeText(u)
         .then(() => toast(t.copied))
-        .catch(() => {});
+        .catch(() => toast(t.copyFailed));
     },
     [t, toast]
   );
@@ -250,8 +285,10 @@ export function useInstaCheck() {
       toggleAutoWL,
       resetChecked,
       rescan,
+      clearAll,
       importFromFile,
-      exportFile,
+      exportProgress,
+      exportRemaining,
       copyRemaining,
       copyUsername,
     },

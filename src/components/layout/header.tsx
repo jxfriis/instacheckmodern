@@ -1,33 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef } from "react";
 
-import { cn } from "@/lib/utils";
+import type { AnimatedIconHandle } from "@/lib/use-icon-animation";
+import { Button } from "@/components/ui/button";
+import { RefreshIcon } from "@/components/ui/refresh";
+import { useInstaCheckContext } from "@/components/app/context";
+import { useI18n } from "@/providers/i18n-provider";
 import { Logo } from "./logo";
 import { ThemeToggle } from "./theme-toggle";
 import { LangToggle } from "./lang-toggle";
 
 export function Header() {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const { t } = useI18n();
+  const { state, actions } = useInstaCheckContext();
+  const iconRef = useRef<AnimatedIconHandle | null>(null);
 
   return (
-    <header className="sticky top-0 z-40 px-4">
-      <div
-        className={cn(
-          "mx-auto flex h-14 w-full max-w-2xl items-center justify-between px-4 transition-all duration-300 ease-out",
-          scrolled
-            ? "mt-2 max-w-xl rounded-full border border-border bg-background/80 shadow-lg shadow-black/5 backdrop-blur-xl"
-            : "border-b border-border/60 bg-background/70 backdrop-blur-xl"
-        )}
-      >
+    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-xl">
+      <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-3 px-4">
         <Logo />
         <div className="flex items-center gap-2">
+          {state.hasRun && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={actions.rescan}
+              onMouseEnter={() => iconRef.current?.startAnimation()}
+              aria-label={t.newCompare}
+            >
+              <RefreshIcon ref={iconRef} size={15} className="[&_svg]:block" />
+              <span className="hidden sm:inline">{t.newCompare}</span>
+            </Button>
+          )}
           <LangToggle />
           <ThemeToggle />
         </div>

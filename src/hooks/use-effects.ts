@@ -46,7 +46,7 @@ export function useEffects() {
       window.innerWidth / 2,
       window.innerHeight / 2,
       ["#ffd166", "#f58529", "#dd2a7b", "#518cd4", "#8134af"],
-      [60, 110, 170, 240, 310],
+      [45, 83, 128, 180, 233],
       5
     );
   }, [enabled]);

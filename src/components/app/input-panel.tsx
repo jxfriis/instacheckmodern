@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowRightIcon } from "lucide-react";
 
-import { SpotlightCard } from "@/components/ui/spotlight-card";
-import { PixelLoader } from "@/components/ui/pixel-loader";
+import { Button } from "@/components/ui/button";
+import { Panel } from "@/components/ui/panel";
+import { Reveal } from "@/components/ui/reveal";
+import { parseList } from "@/lib/instacheck/parse";
+import { getRememberedCount } from "@/lib/instacheck/selectors";
 import { useI18n } from "@/providers/i18n-provider";
 import { useInstaCheckContext } from "./context";
 import { ListTextarea } from "./list-textarea";
@@ -14,97 +15,80 @@ import { ImportButton } from "./import-button";
 export function InputPanel() {
   const { t } = useI18n();
   const { state, actions } = useInstaCheckContext();
-  const reducedMotion = useReducedMotion();
-  const [analyzing, setAnalyzing] = useState(false);
-  const [elapsed, setElapsed] = useState(0);
 
-  const handleRun = () => {
-    if (analyzing) return;
-    if (reducedMotion) {
-      actions.run();
-      return;
-    }
-    setAnalyzing(true);
-    setElapsed(0);
-    const start = performance.now();
-    const tick = window.setInterval(
-      () => setElapsed((performance.now() - start) / 1000),
-      100
-    );
-    window.setTimeout(() => {
-      window.clearInterval(tick);
-      actions.run();
-      setAnalyzing(false);
-    }, 1200);
-  };
+  const following = parseList(state.followingText);
+  const followers = parseList(state.followersText);
+  const ready = following.length > 0 && followers.length > 0;
+  const remembered = getRememberedCount(state);
+
+  let hint = "";
+  if (!following.length && !followers.length) hint = t.needBoth;
+  else if (!following.length) hint = t.needFollowing;
+  else if (!followers.length) hint = t.needFollowers;
+  else if (following.join() === followers.join()) hint = t.listsIdentical;
 
   return (
-    <section className="mx-auto w-full max-w-2xl px-4">
-      <SpotlightCard>
-        <AnimatePresence mode="wait" initial={false}>
-          {analyzing ? (
-            <motion.div
-              key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              className="flex min-h-[20rem] flex-col items-center justify-center gap-4 py-10 text-center"
-            >
-              <p className="text-sm font-semibold">{t.analyzing}</p>
-              <PixelLoader elapsed={elapsed} />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="form"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
-            >
-              <div className="grid gap-4 sm:grid-cols-2">
-                <ListTextarea
-                  id="following"
-                  label={t.lbl1}
-                  value={state.followingText}
-                  onChange={actions.setFollowingText}
-                  placeholder={t.placeholder1}
-                  uploadLabel={t.followingUploadLbl}
-                  accent="following"
-                />
-                <ListTextarea
-                  id="followers"
-                  label={t.lbl2}
-                  value={state.followersText}
-                  onChange={actions.setFollowersText}
-                  placeholder={t.placeholder2}
-                  uploadLabel={t.followersUploadLbl}
-                  accent="followers"
-                />
-              </div>
+    <section className="mx-auto w-full max-w-3xl px-4">
+      <Reveal delay={100}>
+        <Panel>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <ListTextarea
+              id="following"
+              label={t.lbl1}
+              value={state.followingText}
+              onChange={actions.setFollowingText}
+              placeholder={t.placeholder1}
+            />
+            <ListTextarea
+              id="followers"
+              label={t.lbl2}
+              value={state.followersText}
+              onChange={actions.setFollowersText}
+              placeholder={t.placeholder2}
+            />
+          </div>
 
-              <div className="mt-4 flex gap-2">
-                <motion.button
-                  type="button"
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.985 }}
-                  onClick={handleRun}
-                  className="group relative flex h-12 flex-1 items-center justify-center overflow-hidden rounded-xl bg-gradient-ig text-sm font-semibold text-white shadow-lg shadow-ig-pink/20 transition-shadow hover:shadow-ig-pink/35"
-                >
-                  <span className="pointer-events-none absolute inset-0 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.28),transparent)] bg-[length:200%_100%] bg-left transition-[background-position] duration-500 group-hover:bg-right" />
-                  <span className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20 transition-opacity group-hover:ring-white/40" />
-                  <span className="relative flex items-center gap-2">
-                    {t.run}
-                    <ArrowRightIcon className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-                  </span>
-                </motion.button>
-
-                <ImportButton className="h-12" />
-              </div>
-            </motion.div>
+          {remembered > 0 && (
+            <p className="mt-4 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+              {t.remembered.replace("{n}", String(remembered))}
+              <button
+                type="button"
+                onClick={actions.clearAll}
+                className="font-medium text-foreground underline underline-offset-2"
+              >
+                {t.forget}
+              </button>
+            </p>
           )}
-        </AnimatePresence>
-      </SpotlightCard>
+
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+            <Button
+              size="lg"
+              disabled={!ready}
+              onClick={actions.run}
+              className="sm:flex-1"
+            >
+              {t.run}
+              <ArrowRightIcon />
+            </Button>
+            <ImportButton />
+          </div>
+
+          <p className="mt-3 min-h-4 text-center text-xs text-muted-foreground">
+            {hint}
+          </p>
+        </Panel>
+      </Reveal>
+
+      <p className="mt-4 text-center text-sm text-muted-foreground">
+        {t.noListsYet}{" "}
+        <a
+          href="#how-to"
+          className="inline-block font-medium text-foreground underline underline-offset-2"
+        >
+          {t.howLink}
+        </a>
+      </p>
     </section>
   );
 }

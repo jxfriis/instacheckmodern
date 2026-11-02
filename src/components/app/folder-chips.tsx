@@ -2,7 +2,8 @@
 
 import { FolderIcon, XIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { getFolderCount } from "@/lib/instacheck/selectors";
 import { useI18n } from "@/providers/i18n-provider";
 import { useInstaCheckContext } from "./context";
 
@@ -14,32 +15,26 @@ export function FolderChips() {
 
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      <span className="text-xs font-medium text-muted-foreground">
+      <span className="mr-1 text-xs font-medium text-muted-foreground">
         {t.foldersLabel}
       </span>
       {Array.from(state.folders.keys()).map((name) => {
         const active = state.activeFolder === name;
         return (
-          <button
+          <Button
             key={name}
-            type="button"
-            onClick={() =>
-              actions.setActiveFolder(active ? null : name)
-            }
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
-              active
-                ? "border-ig-purple/40 bg-ig-purple/10 text-foreground"
-                : "border-border text-muted-foreground hover:text-foreground"
-            )}
+            variant={active ? "outline" : "ghost"}
+            size="xs"
+            aria-pressed={active}
+            onClick={() => actions.setActiveFolder(active ? null : name)}
           >
-            <FolderIcon className="size-3.5" />
+            <FolderIcon />
             {name}
             <span className="tabular text-[10px] opacity-70">
-              {state.folders.get(name)?.size ?? 0}
+              {getFolderCount(state, name)}
             </span>
-            {active && <XIcon className="size-3" />}
-          </button>
+            {active && <XIcon />}
+          </Button>
         );
       })}
     </div>

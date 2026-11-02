@@ -21,7 +21,21 @@ export function createInitialState(): InstaCheckState {
     searchQ: "",
     activeFolder: null,
     hasRun: false,
+    hydrated: false,
   };
+}
+
+/** Folder contents with `keep` applied; folders left empty disappear. */
+function filterFolders(
+  folders: Map<string, Set<string>>,
+  keep: (u: string) => boolean
+) {
+  const next = new Map<string, Set<string>>();
+  for (const [name, set] of folders) {
+    const members = new Set(Array.from(set).filter(keep));
+    if (members.size > 0) next.set(name, members);
+  }
+  return next;
 }
 
 export function reducer(
@@ -32,17 +46,18 @@ export function reducer(
     case "run": {
       const following = parseList(state.followingText);
       const followers = parseList(state.followersText);
+      const stillFollowing = new Set(following);
+      const keep = (u: string) => stillFollowing.has(u);
       return {
         ...state,
         following,
         followers,
         unfollowers: computeUnfollowers(following, followers),
         checked: new Set<string>(),
-        whitelisted: new Set<string>(),
-        skipped: new Set<string>(),
-        watched: new Map<string, WatchEntry>(),
-        folders: new Map<string, Set<string>>(),
-        lastUsedFolder: null,
+        whitelisted: new Set(Array.from(state.whitelisted).filter(keep)),
+        skipped: new Set(Array.from(state.skipped).filter(keep)),
+        folders: filterFolders(state.folders, keep),
+        followCount: String(stillFollowing.size),
         filterMode: "all",
         sortMode: "az",
         searchQ: "",
@@ -67,12 +82,14 @@ export function reducer(
     case "toggleWhitelist": {
       const whitelisted = new Set(state.whitelisted);
       const checked = new Set(state.checked);
+      const skipped = new Set(state.skipped);
       if (whitelisted.has(action.u)) whitelisted.delete(action.u);
       else {
         whitelisted.add(action.u);
         checked.delete(action.u);
+        skipped.delete(action.u);
       }
-      return { ...state, whitelisted, checked };
+      return { ...state, whitelisted, checked, skipped };
     }
 
     case "toggleSkip": {
@@ -96,34 +113,45 @@ export function reducer(
     }
 
     case "addToFolder": {
-      const folders = new Map<string, Set<string>>();
-      for (const [name, set] of state.folders) {
-        const next = new Set(set);
-        next.delete(action.u);
-        if (next.size > 0) folders.set(name, next);
-      }
+      const folders = filterFolders(state.folders, (u) => u !== action.u);
       const target = folders.get(action.folder) ?? new Set<string>();
       target.add(action.u);
       folders.set(action.folder, target);
 
       const whitelisted = new Set(state.whitelisted);
-      if (state.autoWhitelistOnFolder) whitelisted.add(action.u);
+      const skipped = new Set(state.skipped);
+      if (state.autoWhitelistOnFolder) {
+        whitelisted.add(action.u);
+        skipped.delete(action.u);
+      }
 
-      return { ...state, folders, whitelisted, lastUsedFolder: action.folder };
+      return {
+        ...state,
+        folders,
+        whitelisted,
+        skipped,
+        lastUsedFolder: action.folder,
+        activeFolder:
+          state.activeFolder && folders.has(state.activeFolder)
+            ? state.activeFolder
+            : null,
+      };
     }
 
     case "removeFromFolder": {
-      const folders = new Map<string, Set<string>>();
-      for (const [name, set] of state.folders) {
-        const next = new Set(set);
-        next.delete(action.u);
-        if (next.size > 0) folders.set(name, next);
-      }
-      return { ...state, folders };
+      const folders = filterFolders(state.folders, (u) => u !== action.u);
+      return {
+        ...state,
+        folders,
+        activeFolder:
+          state.activeFolder && folders.has(state.activeFolder)
+            ? state.activeFolder
+            : null,
+      };
     }
 
     case "setFilter":
-      return { ...state, filterMode: action.mode, activeFolder: null };
+      return { ...state, filterMode: action.mode };
 
     case "setSort":
       return { ...state, sortMode: action.mode };
@@ -144,7 +172,22 @@ export function reducer(
       return { ...state, checked: new Set<string>() };
 
     case "rescan":
-      return createInitialState();
+      return {
+        ...createInitialState(),
+        whitelisted: state.whitelisted,
+        skipped: state.skipped,
+        watched: state.watched,
+        folders: state.folders,
+        autoWhitelistOnFolder: state.autoWhitelistOnFolder,
+        lastUsedFolder: state.lastUsedFolder,
+        hydrated: true,
+      };
+
+    case "clearAll":
+      return { ...createInitialState(), hydrated: true };
+
+    case "restore":
+      return action.state;
 
     case "import":
       return { ...action.state, hasRun: true };
@@ -215,5 +258,6 @@ export function deserializeState(data: SerializedState): InstaCheckState {
     searchQ: "",
     activeFolder: null,
     hasRun: data.hasRun ?? false,
+    hydrated: true,
   };
 }

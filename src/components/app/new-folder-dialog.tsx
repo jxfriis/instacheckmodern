@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FolderIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,10 +24,8 @@ export function NewFolderDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const { t } = useI18n();
-  const { state, actions } = useInstaCheckContext();
+  const { actions } = useInstaCheckContext();
   const [name, setName] = useState("");
-
-  const folders = Array.from(state.folders.keys());
 
   const confirm = () => {
     if (!username) return;
@@ -56,30 +52,6 @@ export function NewFolderDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {folders.length > 0 && (
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-muted-foreground">
-              {t.nfExistingLbl}
-            </p>
-            <div className="flex flex-wrap gap-1.5">
-              {folders.map((f) => (
-                <button
-                  key={f}
-                  type="button"
-                  onClick={() => {
-                    if (username) actions.addToFolder(username, f);
-                    onOpenChange(false);
-                  }}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-xs font-medium transition-colors hover:border-ring/40 hover:text-foreground"
-                >
-                  <FolderIcon className="size-3.5" />
-                  {f}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         <div className="space-y-1.5">
           <label
             htmlFor="new-folder-input"
@@ -96,10 +68,7 @@ export function NewFolderDialog({
             }}
             placeholder={t.nfPlaceholder}
             autoFocus
-            className={cn(
-              "h-9 w-full rounded-lg border border-input bg-transparent px-3 text-sm outline-none transition-colors",
-              "placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40"
-            )}
+            className="sunken h-10 w-full px-3 text-sm outline-none placeholder:text-muted-foreground"
           />
         </div>
 

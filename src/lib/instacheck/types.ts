@@ -26,6 +26,8 @@ export interface InstaCheckState {
   activeFolder: string | null;
   /** Whether a comparison has been run and results are visible. */
   hasRun: boolean;
+  /** False only until saved state has been read, so returning users see no flash of the form. */
+  hydrated: boolean;
 }
 
 export type InstaCheckAction =
@@ -46,5 +48,7 @@ export type InstaCheckAction =
   | { type: "setAutoWL"; v: boolean }
   | { type: "resetChecked" }
   | { type: "rescan" }
+  | { type: "clearAll" }
+  | { type: "restore"; state: InstaCheckState }
   | { type: "import"; state: InstaCheckState }
   | { type: "hydrate"; state: InstaCheckState };

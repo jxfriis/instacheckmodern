@@ -9,12 +9,8 @@ export function todayStr(): string {
   ).padStart(2, "0")}`;
 }
 
-export function exportFileName(): string {
-  const d = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `InstaCheck ${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(
-    d.getDate()
-  )}.txt`;
+export function exportFileName(suffix = ""): string {
+  return `InstaCheck ${todayStr()}${suffix}.txt`;
 }
 
 const FLAG_WL = "★";
@@ -27,14 +23,8 @@ const FLAG_FOLDER = "📁";
  * Serialize the full state to a .txt file (backward-compatible with the
  * original InstaCheck export format).
  */
-export function exportState(
-  state: InstaCheckState,
-  includeWhitelist: boolean,
-  includeFollowCount = false
-): string {
-  const lines = state.unfollowers
-    .filter((u) => includeWhitelist || !state.whitelisted.has(u))
-    .map((u) => {
+export function exportState(state: InstaCheckState): string {
+  const lines = state.unfollowers.map((u) => {
       const folder = getUserFolder(state, u);
       const watched = state.watched.get(u);
       const flags = [
@@ -51,10 +41,10 @@ export function exportState(
         .filter(Boolean)
         .join(" ");
       return flags ? `${flags} ${u}` : u;
-    });
+  });
 
   const settings = [`autoWL=${state.autoWhitelistOnFolder}`];
-  if (includeFollowCount && state.followCount) {
+  if (state.followCount) {
     settings.push(`followCount=${state.followCount}`);
   }
   lines.unshift(`#settings ${settings.join(" ")}`);
@@ -85,6 +75,7 @@ export function importState(text: string): InstaCheckState | null {
     searchQ: "",
     activeFolder: null,
     hasRun: true,
+    hydrated: true,
   };
 
   const raw = text

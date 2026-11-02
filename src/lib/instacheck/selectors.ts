@@ -10,33 +10,34 @@ export function getUserFolder(
   return null;
 }
 
+function isPending(state: InstaCheckState, u: string) {
+  return (
+    !state.checked.has(u) && !state.whitelisted.has(u) && !state.skipped.has(u)
+  );
+}
+
+function isDone(state: InstaCheckState, u: string) {
+  return (
+    state.checked.has(u) && !state.whitelisted.has(u) && !state.skipped.has(u)
+  );
+}
+
 export function getDoneCount(state: InstaCheckState): number {
-  return state.unfollowers.filter(
-    (u) =>
-      state.checked.has(u) &&
-      !state.whitelisted.has(u) &&
-      !state.skipped.has(u)
-  ).length;
+  return state.unfollowers.filter((u) => isDone(state, u)).length;
 }
 
 export function getRemainingCount(state: InstaCheckState): number {
-  return state.unfollowers.filter(
-    (u) =>
-      !state.checked.has(u) &&
-      !state.whitelisted.has(u) &&
-      !state.skipped.has(u)
-  ).length;
+  return state.unfollowers.filter((u) => isPending(state, u)).length;
 }
 
 export function getProgress(state: InstaCheckState): number {
-  const wlCount = state.whitelisted.size;
-  const skipCount = state.skipped.size;
-  const nonWLTotal = state.unfollowers.length - wlCount - skipCount;
-  if (nonWLTotal <= 0) return 0;
-  return Math.round((getDoneCount(state) / nonWLTotal) * 100);
+  const done = getDoneCount(state);
+  const total = done + getRemainingCount(state);
+  if (total <= 0) return 0;
+  return Math.round((done / total) * 100);
 }
 
-/** Remaining to reach the user's "following now" goal, or null if no goal. */
+/** What the user follows now: the count at the start minus those unfollowed since. */
 export function getGoalRemaining(state: InstaCheckState): number | null {
   if (state.followCount === "") return null;
   return Math.max(Number(state.followCount) - getDoneCount(state), 0);
@@ -67,12 +68,7 @@ export function getSorted(
   if (sortMode === "za") return list.sort((a, b) => byUsername(b, a));
   if (sortMode === "pending") {
     const rank = (u: string) => {
-      if (
-        !state.checked.has(u) &&
-        !state.whitelisted.has(u) &&
-        !state.skipped.has(u)
-      )
-        return 0;
+      if (isPending(state, u)) return 0;
       if (state.whitelisted.has(u)) return 1;
       if (state.skipped.has(u)) return 2;
       return 3;
@@ -82,55 +78,68 @@ export function getSorted(
   return list.sort(byUsername);
 }
 
+function matchesFilter(state: InstaCheckState, u: string) {
+  switch (state.filterMode) {
+    case "pending":
+      return isPending(state, u);
+    case "done":
+      return isDone(state, u);
+    case "wl":
+      return state.whitelisted.has(u);
+    case "skip":
+      return state.skipped.has(u);
+    case "watch":
+      return state.watched.has(u);
+    default:
+      return true;
+  }
+}
+
 export function getVisible(state: InstaCheckState): string[] {
-  const filtered = state.unfollowers.filter((u) => {
-    const isWatch = state.watched.has(u);
-    if (state.filterMode === "watch") {
-      return (
-        isWatch &&
-        (!state.searchQ || u.includes(state.searchQ)) &&
-        (!state.activeFolder || state.folders.get(state.activeFolder)?.has(u))
-      );
-    }
-    if (
-      state.filterMode === "pending" &&
-      ((!isWatch && state.checked.has(u)) ||
-        state.whitelisted.has(u) ||
-        state.skipped.has(u))
-    )
-      return false;
-    if (
-      state.filterMode === "done" &&
-      (!state.checked.has(u) ||
-        state.whitelisted.has(u) ||
-        state.skipped.has(u))
-    )
-      return false;
-    if (state.filterMode === "wl" && !state.whitelisted.has(u)) return false;
-    if (state.filterMode === "skip" && !state.skipped.has(u)) return false;
-    if (
-      state.activeFolder &&
-      !state.folders.get(state.activeFolder)?.has(u)
-    )
-      return false;
-    if (state.searchQ && !u.includes(state.searchQ)) return false;
-    return true;
-  });
+  const q = state.searchQ.trim().toLowerCase().replace(/^@/, "");
+  const filtered = state.unfollowers.filter(
+    (u) =>
+      matchesFilter(state, u) &&
+      (!state.activeFolder || state.folders.get(state.activeFolder)?.has(u)) &&
+      (!q || u.includes(q))
+  );
   return getSorted(state, filtered);
 }
 
-/** Counts shown on the filter pills. */
+/** The next account to deal with, in the order the list is sorted. */
+export function getNextUp(state: InstaCheckState): string | null {
+  const pending = state.unfollowers.filter((u) => isPending(state, u));
+  return getSorted(state, pending)[0] ?? null;
+}
+
+/** Counts shown on the filters. Decisions carried over can name accounts no longer in the list. */
 export function getFilterCounts(state: InstaCheckState) {
-  const doneCount = getDoneCount(state);
-  const remaining = getRemainingCount(state);
+  const inList = (has: (u: string) => boolean) =>
+    state.unfollowers.filter(has).length;
   return {
     all: state.unfollowers.length,
-    pending: remaining,
-    done: doneCount,
-    wl: state.whitelisted.size,
-    skip: state.skipped.size,
-    watch: state.watched.size,
+    pending: getRemainingCount(state),
+    done: getDoneCount(state),
+    wl: inList((u) => state.whitelisted.has(u)),
+    skip: inList((u) => state.skipped.has(u)),
+    watch: inList((u) => state.watched.has(u)),
   };
+}
+
+export function getFolderCount(state: InstaCheckState, name: string): number {
+  const folder = state.folders.get(name);
+  return folder ? state.unfollowers.filter((u) => folder.has(u)).length : 0;
+}
+
+/** How many choices from an earlier comparison would carry over to the next one. */
+export function getRememberedCount(state: InstaCheckState): number {
+  const inFolders = Array.from(state.folders.values()).reduce(
+    (sum, set) => sum + set.size,
+    0
+  );
+  return (
+    state.whitelisted.size + state.skipped.size + state.watched.size + inFolders
+  );
 }
 
 export const FILTER_MODES: FilterMode[] = [

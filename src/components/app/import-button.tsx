@@ -8,7 +8,7 @@ import { CloudUploadIcon } from "@/components/ui/cloud-upload";
 import { useI18n } from "@/providers/i18n-provider";
 import { useInstaCheckContext } from "./context";
 
-export function ImportButton({ className }: { className?: string }) {
+export function ImportButton() {
   const { t } = useI18n();
   const { actions } = useInstaCheckContext();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -20,18 +20,14 @@ export function ImportButton({ className }: { className?: string }) {
     <>
       <Button
         variant="outline"
+        size="lg"
         onClick={() => {
           inputRef.current?.click();
           play();
         }}
         onMouseEnter={play}
-        className={className}
       >
-        <CloudUploadIcon
-          ref={iconRef}
-          size={16}
-          className="[&_svg]:block"
-        />
+        <CloudUploadIcon ref={iconRef} size={16} className="[&_svg]:block" />
         {t.import}
       </Button>
       <input
@@ -41,14 +37,14 @@ export function ImportButton({ className }: { className?: string }) {
         className="hidden"
         onChange={async (e) => {
           const file = e.target.files?.[0];
+          e.target.value = "";
           if (file) {
             try {
               actions.importFromFile(await file.text());
             } catch {
-              /* ignore unreadable file */
+              actions.importFromFile("");
             }
           }
-          e.target.value = "";
         }}
       />
     </>
